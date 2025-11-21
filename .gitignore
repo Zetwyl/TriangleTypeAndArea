@@ -1,0 +1,7 @@
+# Исключаем bin и obj во всех подкаталогах
+bin/
+obj/
+
+# Исключаем TestResults, .vs и т.д. в корне
+/TestResults/
+.vs/
