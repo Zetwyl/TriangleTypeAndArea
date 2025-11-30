@@ -57,82 +57,75 @@ namespace TriangleTests
                 $"Провал общей валидации IsValid для ({a}, {b}, {c}). Ожидалось: {expected}, Получено: {actual}.");
         }
 
-
         // -------------------------------------------------------------------
-        // ГРУППА 2: Проверка Площади (GetAreaTriangle)
-        // -------------------------------------------------------------------
-
-        [TestMethod]
-        [DataRow(3.0, 4.0, 5.0, 6.0d, DisplayName = "Calculator_01_Area (Прямоугольный 3-4-5)")] // Прямоугольный
-        [DataRow(10.0, 10.0, 10.0, 43.30127d, DisplayName = "Calculator_01_Area (Равносторонний 10-10-10)")] // Равносторонний
-        [DataRow(2.0, 3.0, 4.0, 2.9047375d, DisplayName = "Calculator_01_Area (Разносторонний 2-3-4)")] // Разносторонний
-        public void Calculator_01_AreaCalculation_Valid(double a, double b, double c, double expectedArea)
-        {
-            // Act
-            double actualArea = Calculator.GetAreaTriangle((decimal)a, (decimal)b, (decimal)c);
-
-            // Assert: Проверяет, что фактическая площадь совпадает с ожидаемой в пределах AreaTolerance.
-            Assert.AreEqual(expectedArea, actualArea, AreaTolerance,
-                 $"Ошибка площади для сторон ({a}, {b}, {c}). Ожидалось успешное вычисление площади: {expectedArea:F5}, Фактически: {actualArea:F5}.");
-        }
-
-        [TestMethod]
-        [DataRow(1.0, 2.0, 10.0, DisplayName = "Calculator_02_Area (Невалидный - ожидается NaN)")]
-        [DataRow(-5.0, 5.0, 5.0, DisplayName = "Calculator_02_Area (Отрицательная сторона - ожидается NaN)")]
-        [DataRow(0.0, 5.0, 5.0, DisplayName = "Calculator_02_Area (Нулевая сторона - ожидается NaN)")]
-        public void Calculator_02_AreaCalculation_Invalid_ExpectsNaN(double a, double b, double c)
-        {
-            // Act
-            double actualArea = Calculator.GetAreaTriangle((decimal)a, (decimal)b, (decimal)c);
-
-            // Assert: Проверяем, что для невалидного ввода возвращается double.NaN.
-            Assert.IsTrue(double.IsNaN(actualArea),
-                $"Площадь должна быть NaN для невалидного треугольника ({a},{b},{c}), но получено число: {actualArea}.");
-        }
-
-
-        // -------------------------------------------------------------------
-        // ГРУППА 3: Проверка Типа (GetTypeTriangle)
+        // ГРУППА 2: Проверка всех типов треугольников (GetTypeTriangle)
         // -------------------------------------------------------------------
 
         [TestMethod]
-        [DataRow(3.0, 4.0, 5.0, "Прямоугольный", DisplayName = "Calculator_03_Type (Прямоугольный 3-4-5)")]
-        [DataRow(10.0, 10.0, 10.0, "Остроугольный", DisplayName = "Calculator_03_Type (Остроугольный/Равносторонний 10-10-10)")]
-        [DataRow(2.0, 3.0, 4.0, "Тупоугольный", DisplayName = "Calculator_03_Type (Тупоугольный 2-3-4)")]
-        [DataRow(1.0, 2.0, 10.0, "Невалидный", DisplayName = "Calculator_03_Type (Невалидный ввод)")]
-        [DataRow(5.0, 3.0, 4.0, "Прямоугольный", DisplayName = "Calculator_03_Type (Прямоугольный несортированный)")]
-        [DataRow(7.07106781, 7.07106781, 10.0, "Прямоугольный", DisplayName = "Calculator_03_Type (Равнобедренный Прямоугольный с √2)")]
-        public void Calculator_03_TypeClassification(double a, double b, double c, string expectedType)
+        // Разносторонние
+        [DataRow(10.0, 11.0, 12.0, "Остроугольный", DisplayName = "Calculator_01_Type (Разносторонний Остроугольный)")]
+        [DataRow(2.0, 3.0, 4.0, "Тупоугольный", DisplayName = "Calculator_01_Type (Разносторонний Тупоугольный)")]
+        // Прямоугольные
+        [DataRow(3.0, 4.0, 5.0, "Прямоугольный", DisplayName = "Calculator_01_Type (Прямоугольный 3-4-5)")]
+        [DataRow(5.0, 3.0, 4.0, "Прямоугольный", DisplayName = "Calculator_01_Type (Прямоугольный несортированный)")]
+        // Равнобедренные
+        [DataRow(10.0, 10.0, 10.0, "Остроугольный", DisplayName = "Calculator_01_Type (Равносторонний/Остроугольный)")]
+        [DataRow(5.0, 5.0, 6.0, "Остроугольный", DisplayName = "Calculator_01_Type (Равнобедренный Остроугольный)")]
+        [DataRow(5.0, 5.0, 8.0, "Тупоугольный", DisplayName = "Calculator_01_Type (Равнобедренный Тупоугольный)")]
+        // Проверка допусков (RightAngleTolerance)
+        [DataRow(3.0, 4.0, 5.00000005, "Прямоугольный", DisplayName = "Calculator_01_Type (Допуск: Попадание в Tolerance)")]
+        [DataRow(3.0, 4.0, 5.001, "Тупоугольный", DisplayName = "Calculator_01_Type (Допуск: Промах, классификация: Тупоугольный)")]
+        public void Calculator_01_TypeClassification_AllValidTypes(double a, double b, double c, string expectedType)
         {
-            // Act
+            // ACT: Проверяем, что для валидных данных корректно определяется тип.
             string actualType = Calculator.GetTypeTriangle((decimal)a, (decimal)b, (decimal)c);
-
-            // Assert: Проверяем, что возвращаемый тип соответствует ожидаемому.
-            Assert.AreEqual(expectedType, actualType,
-                 $"Ошибка определения типа для сторон ({a}, {b}, {c}). Ожидалось успешное определение как '{expectedType}', Фактически: '{actualType}'.");
+            Assert.AreEqual(expectedType, actualType);
         }
 
         // -------------------------------------------------------------------
-        // ГРУППА 4: Тесты крайних случаев и переполнения (OverflowException)
+        // ГРУППА 3: Проверка Площади (GetAreaTriangle)
+        // (Покрытие точности и переполнения)
         // -------------------------------------------------------------------
 
         [TestMethod]
-        [DataRow(1E14, 1E14, 1E14, DisplayName = "Calculator_04_AreaOverflow (Равносторонний, вызывает Decimal Overflow)")]
-        [DataRow(7E13, 8E13, 9E13, DisplayName = "Calculator_04_AreaOverflow (Разносторонний, вызывает Decimal Overflow)")]
-        public void Calculator_04_AreaCalculation_Overflow_ExpectsNaN(double a, double b, double c)
+        [DataRow(3.0, 4.0, 5.0, 6.0d, DisplayName = "Calculator_02_Area (Прямоугольный)")]
+        [DataRow(10.0, 10.0, 10.0, 43.30127d, DisplayName = "Calculator_02_Area (Равносторонний)")]
+        [DataRow(2.0, 3.0, 4.0, 2.9047375d, DisplayName = "Calculator_02_Area (Разносторонний)")]
+        public void Calculator_02_AreaCalculation_Valid(double a, double b, double c, double expectedArea)
         {
-            // Act
-            decimal decimalA = (decimal)a;
-            decimal decimalB = (decimal)b;
-            decimal decimalC = (decimal)c;
+            // ACT: Проверяем, что площадь вычисляется с заданной точностью.
+            double actualArea = Calculator.GetAreaTriangle((decimal)a, (decimal)b, (decimal)c);
+            Assert.AreEqual(expectedArea, actualArea, AreaTolerance);
+        }
 
-            // Используем очень большие числа, которые приведут к OverflowException 
-            // при умножении (S^2) в типе decimal.
-            double actualArea = Calculator.GetAreaTriangle(decimalA, decimalB, decimalC);
+        [TestMethod]
+        [DataRow(1E14, 1E14, 1E14, DisplayName = "Calculator_03_AreaOverflow (Вызывает Decimal Overflow)")]
+        public void Calculator_03_AreaCalculation_Overflow_ExpectsNaN(double a, double b, double c)
+        {
+            // ACT: Проверяем, что при переполнении типа decimal возвращается NaN.
+            double actualArea = Calculator.GetAreaTriangle((decimal)a, (decimal)b, (decimal)c);
+            Assert.IsTrue(double.IsNaN(actualArea));
+        }
 
-            // Assert: Проверяем, что при переполнении decimal, GetAreaTriangle возвращает double.NaN.
-            Assert.IsTrue(double.IsNaN(actualArea),
-                $"Площадь должна быть NaN из-за переполнения decimal для ({a},{b},{c}), но получено: {actualArea}.");
+        // -------------------------------------------------------------------
+        // ГРУППА 4: Тестирование обработки невалидного ввода
+        // -------------------------------------------------------------------
+
+        [TestMethod]
+        // Наборы данных для проверки работы защитного механизма на невалидных треугольниках.
+        [DataRow(1.0, 2.0, 10.0, "Невалидный", double.NaN, DisplayName = "Calculator_04_Invalid (Нарушение неравенства)")]
+        [DataRow(-5.0, 5.0, 5.0, "Невалидный", double.NaN, DisplayName = "Calculator_04_Invalid (Отрицательная сторона)")]
+        [DataRow(5.0, 5.0, 10.0, "Невалидный", double.NaN, DisplayName = "Calculator_04_Invalid (Вырожденный)")]
+        [DataRow(0.0, 5.0, 5.0, "Невалидный", double.NaN, DisplayName = "Calculator_04_Invalid (Нулевая сторона)")]
+        public void Calculator_04_InvalidInput_ExpectsInvalidAndNaN(double a, double b, double c, string expectedType, double expectedArea)
+        {
+            // ACT 1: Проверка типа
+            string actualType = Calculator.GetTypeTriangle((decimal)a, (decimal)b, (decimal)c);
+            Assert.AreEqual(expectedType, actualType, "Ошибка в возвращаемом типе.");
+
+            // ACT 2: Проверка площади
+            double actualArea = Calculator.GetAreaTriangle((decimal)a, (decimal)b, (decimal)c);
+            Assert.IsTrue(double.IsNaN(actualArea), "Ошибка в возвращаемой площади (должно быть NaN).");
         }
     }
 }
